@@ -1,5 +1,11 @@
 # Installed application, installers and local backups
-/01软件/
+/01软件/小笺/*
+!/01软件/小笺/resources/
+/01软件/小笺/resources/*
+!/01软件/小笺/resources/app.asar
+!/01软件/小笺/发行文件清单.json
+!/01软件/小笺/README.md
+!/01软件/小笺/LICENSE.electron.txt
 /02安装包/
 /04备份/
 
@@ -14,3 +20,10 @@ node_modules/
 !.env.example
 .DS_Store
 Thumbs.db
+
+# Personal records, backups, local storage and publishing screenshots
+**/小笺数据/
+**/records.json
+**/storage-config.json
+**/Local Storage/
+/github-*.png

@@ -2,12 +2,16 @@
 
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
-const { app, BrowserWindow, dialog, Menu, session } = require("electron");
+const { app, BrowserWindow, dialog, Menu, session, ipcMain, shell } = require("electron");
+const { RecordStore } = require('./storage');
+const { migrate } = require('../dist/app');
 
 const APP_ID = "com.xiaojian.stickylife";
 const ENTRY_FILE = path.join(__dirname, "..", "dist", "index.html");
 const ENTRY_URL = pathToFileURL(ENTRY_FILE);
 let mainWindow = null;
+let recordStore = null;
+let storeError = '';
 
 const hasSingleInstanceLock = app.requestSingleInstanceLock();
 
@@ -26,6 +30,10 @@ if (!hasSingleInstanceLock) {
   app.whenReady().then(() => {
     Menu.setApplicationMenu(null);
     denyRendererPermissions();
+    try {
+      recordStore = new RecordStore({ userData: app.getPath('userData'), installDirectory: path.dirname(app.getPath('exe')), fallbackDirectory: app.getPath('documents'), validate: migrate });
+    } catch (error) { storeError = error.message; }
+    registerStorageHandlers();
     createMainWindow();
 
     app.on("activate", () => {
@@ -47,7 +55,6 @@ function createMainWindow() {
     minHeight: 620,
     show: false,
     backgroundColor: "#f7f4ec",
-    icon: path.join(__dirname, "..", "assets", "icon.png"),
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -79,6 +86,42 @@ function createMainWindow() {
   mainWindow.loadFile(ENTRY_FILE).catch((error) => {
     dialog.showErrorBox("小笺无法启动", `本地页面加载失败：${error.message}`);
     app.quit();
+  });
+}
+
+function registerStorageHandlers() {
+  const handle = (channel, handler) => ipcMain.handle(channel, async (event, input) => {
+    try {
+      if (!mainWindow || event.sender !== mainWindow.webContents || !event.senderFrame || event.senderFrame !== event.sender.mainFrame || !isTrustedLocalUrl(event.senderFrame.url)) throw Error('无效的数据访问来源');
+      if (!recordStore) throw Error(storeError || '记录目录无法打开');
+      return { ok: true, value: await handler(input) };
+    } catch (error) { return { ok: false, error: error.message }; }
+  });
+  handle('records:load', () => ({ data: recordStore.load(), info: recordStore.info() }));
+  handle('records:info', () => recordStore.info());
+  handle('records:save', data => recordStore.save(data));
+  handle('records:backup', () => { const data = recordStore.load(); if (!data) throw Error('还没有可备份的记录，请先保存一条记录或设置'); return recordStore.backup(data); });
+  handle('records:preferences', input => recordStore.setPreferences(input));
+  handle('records:choose-data', async mode => {
+    let folder;
+    if (mode === 'install') folder = path.join(path.dirname(app.getPath('exe')), '小笺数据');
+    else {
+      const result = await dialog.showOpenDialog(mainWindow, { title: '选择记录文件夹（记录与备份将复制到这里）', defaultPath: recordStore.config.dataRoot, properties: ['openDirectory', 'createDirectory'] });
+      if (result.canceled) return null;
+      folder = result.filePaths[0];
+    }
+    return recordStore.changeDataRoot(folder);
+  });
+  handle('records:choose-backup', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, { title: '选择备份文件夹', defaultPath: recordStore.config.backupRoot, properties: ['openDirectory', 'createDirectory'] });
+    return result.canceled ? null : recordStore.changeBackupRoot(result.filePaths[0]);
+  });
+  handle('records:open-folder', async kind => {
+    const folder = kind === 'data' ? recordStore.config.dataRoot : kind === 'backup' ? recordStore.config.backupRoot : null;
+    if (!folder) throw Error('无效的文件夹类型');
+    require('node:fs').mkdirSync(folder, { recursive: true });
+    const error = await shell.openPath(folder); if (error) throw Error(error);
+    return true;
   });
 }
 

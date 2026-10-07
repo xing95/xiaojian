@@ -1,0 +1,111 @@
+{
+  "version": "1.3.0",
+  "excludedUserData": true,
+  "files": [
+    {
+      "sha256": "a1f2080fd6e08b0edfd981e6fa35a04dcdb162ed079f6726601fe952ed239c50",
+      "bytes": 246070272,
+      "path": "小笺.exe"
+    },
+    {
+      "sha256": "ab7c4b7b6cb8832a31d44b95ec50ce52294f49422a3bdde4e21968eca2930cbe",
+      "bytes": 719654,
+      "path": "chrome_100_percent.pak"
+    },
+    {
+      "sha256": "30fa4a6e27c9ff2fb0f939f01158477e621a67d86e9ecb84cf11b3947db8eb9d",
+      "bytes": 1269017,
+      "path": "chrome_200_percent.pak"
+    },
+    {
+      "sha256": "a05f99734f7c4822fefc12b367af21fd0976ed6608752fb1e1e80b6ece7ecbbb",
+      "bytes": 4741488,
+      "path": "d3dcompiler_47.dll"
+    },
+    {
+      "sha256": "b2b5c67bc4a9c92a0ea87000415e7970488d1ca25767518d4cc27b88f18fb6ac",
+      "bytes": 25744896,
+      "path": "dxcompiler.dll"
+    },
+    {
+      "sha256": "77e039c905030a641e53658a008b74e90635a5ea9b6b79eabd0f2003bdfca59a",
+      "bytes": 1509760,
+      "path": "dxil.dll"
+    },
+    {
+      "sha256": "336587847c4ed3ef1a195d1aaea3d3951c9749a035ffa7951df4c0e02971e4e0",
+      "bytes": 3113472,
+      "path": "ffmpeg.dll"
+    },
+    {
+      "sha256": "9f48c7f9c7c94d516a14870707e910ab94d75ae640ff6842c4af53276cd26ebe",
+      "bytes": 10876560,
+      "path": "icudtl.dat"
+    },
+    {
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d",
+      "bytes": 1096,
+      "path": "LICENSE.electron.txt"
+    },
+    {
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70",
+      "bytes": 20472830,
+      "path": "LICENSES.chromium.html"
+    },
+    {
+      "sha256": "3d8c36b2ec7099a27fe00763e5af28319643ba65c1b48b85eb6a7caaae034ba6",
+      "bytes": 12435445,
+      "path": "resources.pak"
+    },
+    {
+      "sha256": "1176cfa83f9ef458e7ed5b5b255c9289691dbef3ff1e4a073a5c90f9a16e8458",
+      "bytes": 368776,
+      "path": "snapshot_blob.bin"
+    },
+    {
+      "sha256": "ea0fef1cfab33a5341d1f6e65aea698eaca3abbc588e64d458a488b54da0cc6a",
+      "bytes": 14401,
+      "path": "uninstallerIcon.ico"
+    },
+    {
+      "sha256": "d9d3ec18e937ed2fddd02d92e4f0726919769e16f2ea17f962d23e40d5962b7b",
+      "bytes": 742208,
+      "path": "v8_context_snapshot.bin"
+    },
+    {
+      "sha256": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9",
+      "bytes": 106,
+      "path": "vk_swiftshader_icd.json"
+    },
+    {
+      "sha256": "cfb8a533c5da1ade3fd4e66ebd0acf7186bd17fb3cc09d48809a7909c4aaf0f8",
+      "bytes": 5520384,
+      "path": "vk_swiftshader.dll"
+    },
+    {
+      "sha256": "c1b383f18c0949f233e949ae197c2ad4c416abe7790894d7e395d73116403b4f",
+      "bytes": 939008,
+      "path": "vulkan-1.dll"
+    },
+    {
+      "sha256": "23b271e8009bfa14783700cd0712b4ecaa5b8f2ea28a4d81ae1d7e05bc0c96b1",
+      "bytes": 586582,
+      "path": "locales/en-US.pak"
+    },
+    {
+      "sha256": "ba8ac4bf82b50728d907215d1993948457835bf2942a4d7266a3f8af5f51de15",
+      "bytes": 592116,
+      "path": "locales/zh-CN.pak"
+    },
+    {
+      "sha256": "44c3a316fe483b2b984a16bd0385446928184870a781f21e0e03676ca4d24e17",
+      "bytes": 79015,
+      "path": "resources/app.asar"
+    },
+    {
+      "sha256": "9b1fbf0c11c520ae714af8aa9af12cfd48503eedecd7398d8992ee94d1b4dc37",
+      "bytes": 107520,
+      "path": "resources/elevate.exe"
+    }
+  ]
+}

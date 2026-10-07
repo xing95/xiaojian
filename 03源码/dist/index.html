@@ -28,6 +28,7 @@
           <span>加班</span>
         </button>
 <button class="nav-item" type="button" data-view="leave"><span>◷</span><span>调休</span></button><button class="nav-item" type="button" data-view="logs"><span>✎</span><span>日志</span></button><button class="nav-item" type="button" data-view="reports"><span>▤</span><span>周报</span></button>
+<button class="nav-item" type="button" data-view="settings"><span>⚙</span><span>设置</span></button>
       </nav>
 
       <div class="sidebar-footer">
@@ -70,7 +71,7 @@
       </header>
 
       <div class="view-stack">
-<section class="view is-active" id="view-dashboard" data-page="dashboard"><div class="dashboard-hero"><div><p class="hero-kicker" id="dashboard-date"></p><h2>每一份付出，都值得记录。</h2><p>记录加班，整理每日进展，让周报自然形成。</p></div><div class="quick-actions"><button type="button" data-create="overtime"><span class="quick-icon overtime">时</span>记加班</button><button type="button" data-create="logs"><span class="quick-icon note">✎</span>写日志</button><button type="button" data-create="reports"><span class="quick-icon task">▤</span>写周报</button></div></div><div class="summary-grid balance-grid" id="dashboard-balance"></div><div class="summary-grid" id="dashboard-summary"></div><div class="dashboard-grid"><article class="panel"><div class="panel-heading"><h3>最近工作日志</h3><button class="text-button" data-go="logs">查看全部</button></div><div id="dashboard-logs"></div></article><article class="panel"><div class="panel-heading"><h3>本周工作回顾</h3><button class="text-button" data-create="reports">生成周报</button></div><div id="dashboard-week"></div></article></div></section>
+<section class="view is-active" id="view-dashboard" data-page="dashboard"><div class="dashboard-hero"><div><p class="hero-kicker" id="dashboard-date"></p><h2>每一份付出，都值得记录。</h2><p>记录加班，整理每日进展，让周报自然形成。</p></div><div class="quick-actions"><button type="button" data-create="overtime"><span class="quick-icon overtime">时</span>记加班</button><button type="button" data-create="logs"><span class="quick-icon work-log">✎</span>写日志</button><button type="button" data-create="reports"><span class="quick-icon work-report">▤</span>写周报</button></div></div><div class="summary-grid balance-grid" id="dashboard-balance"></div><div class="summary-grid" id="dashboard-summary"></div><div class="dashboard-grid"><article class="panel"><div class="panel-heading"><h3>最近工作日志</h3><button class="text-button" data-go="logs">查看全部</button></div><div id="dashboard-logs"></div></article><article class="panel"><div class="panel-heading"><h3>本周工作回顾</h3><button class="text-button" data-create="reports">生成周报</button></div><div id="dashboard-week"></div></article></div></section>
 <section class="view" id="view-logs" data-page="logs" hidden><div class="page-toolbar"><div><h2>工作日志</h2><p>记录今日成果、遇到的问题与明日计划</p></div><button class="primary-button" data-create="logs">写日志</button></div><div class="filter-row"><label>月份 <input id="logs-month" type="month"></label><button class="text-button" id="logs-all">全部月份</button></div><div id="logs-list" class="work-list"></div></section>
 <section class="view" id="view-reports" data-page="reports" hidden><div class="page-toolbar"><div><h2>工作周报</h2><p>汇总一周成果，明确下一步方向</p></div><button class="primary-button" data-create="reports">生成周报</button></div><div id="reports-list" class="work-list"></div></section>
         <section class="view" id="view-overtime" data-page="overtime" aria-labelledby="overtime-heading" hidden>
@@ -97,13 +98,21 @@
           <article class="panel history-panel"><div class="panel-heading panel-heading-wrap"><div><h3>历史月度统计</h3></div><div class="inline-filters"><select id="history-year" aria-label="筛选统计年份"><option value="">全部年份</option></select><button type="button" class="secondary-button" id="history-export">导出统计</button></div></div><p class="history-summary" id="history-summary"></p><p class="work-meta">单位：小时。月末结余 = 月初结余 + 当月加班 − 当月调休；结余按全部历史记录连续结转。点击月份查看日历。</p><div class="history-scroll"><table class="history-table"><thead><tr><th>月份</th><th>加班时长</th><th>加班天数</th><th>调休时长</th><th>当月净增加</th><th>月初结余</th><th>月末结余</th></tr></thead><tbody id="history-body"></tbody></table></div></article>
         </section>
         <section class="view" id="view-leave" data-page="leave" hidden><div class="page-toolbar"><div><h2>调休记录</h2><p>按实际使用的小时记录；同一天分次调休请合并时长，自动扣减加班结余</p></div><button type="button" class="primary-button" data-create="leave">记录调休</button></div><div class="summary-grid balance-grid" id="leave-summary"></div><div class="filter-row"><label>月份 <input id="leave-month" type="month"></label><button type="button" class="text-button" id="leave-all">全部月份</button><span id="leave-filter-total" class="work-meta"></span></div><div id="leave-list" class="work-list"></div></section>
+<section class="view" id="view-settings" data-page="settings" hidden>
+<div class="page-toolbar"><div><h2>设置</h2><p>记录保存在哪里、如何备份，一目了然</p></div><span class="work-meta">小笺 1.3.0</span></div>
+<article class="panel settings-panel"><h3>记录与备份位置</h3><p class="work-meta">默认优先使用安装目录下的「小笺数据」。无法写入时使用文档目录；可以改到其他磁盘或文件夹。更换位置会复制记录和备份，原文件保留。</p>
+<label class="settings-label">当前记录文件</label><p class="storage-path" id="setting-data-path"></p><div class="settings-actions"><button class="secondary-button" type="button" data-desktop-setting data-folder-action="data">更换记录文件夹</button><button class="secondary-button" type="button" data-desktop-setting data-folder-action="install">使用安装目录</button><button class="text-button" type="button" data-desktop-setting data-folder-action="open-data">打开记录文件夹</button></div>
+<label class="settings-label">备份文件夹</label><p class="storage-path" id="setting-backup-path"></p><div class="settings-actions"><button class="secondary-button" type="button" data-desktop-setting data-folder-action="backup">更换备份文件夹</button><button class="text-button" type="button" data-desktop-setting data-folder-action="open-backup">打开备份文件夹</button><button class="primary-button" type="button" data-desktop-setting data-folder-action="backup-now">立即备份</button></div><p class="work-meta" id="setting-last-backup"></p>
+<details><summary>存储设置文件</summary><p class="storage-path" id="setting-config-path"></p></details></article>
+<form id="settings-form" class="panel settings-panel"><h3>使用偏好</h3><div class="settings-grid"><label class="work-field">主题<select id="setting-theme"><option value="light">浅色</option><option value="dark">深色</option></select></label><label class="work-field">启动页面<select id="setting-startup"><option value="dashboard">工作概览</option><option value="overtime">加班</option><option value="leave">调休</option><option value="logs">日志</option><option value="reports">周报</option></select></label><label class="work-field">字号<select id="setting-font"><option value="14">小</option><option value="16">标准</option><option value="18">大</option></select></label><label class="work-field">自动备份保留数量<input type="number" id="setting-backup-count" min="7" max="365" value="30" data-desktop-setting></label></div><label class="settings-check"><input type="checkbox" id="setting-auto-backup" data-desktop-setting checked> 每天首次保存前自动备份（每天一份）</label><p class="work-meta">自动备份用于恢复修改前的数据。只清理超出保留数量的自动备份，手动备份始终保留。</p><button type="submit" class="primary-button">保存设置</button></form>
+</section>
       </div>
     </main>
 
     <nav class="mobile-nav" aria-label="移动端导航">
       <button class="is-active" type="button" data-view="dashboard"><span>⌂</span>首页</button>
 <button type="button" data-view="leave"><span>◷</span>调休</button><button type="button" data-view="logs"><span>✎</span>日志</button><button type="button" data-view="reports"><span>▤</span>周报</button>      <button type="button" data-view="overtime"><span>时</span>加班</button>
-    </nav>
+<button type="button" data-view="settings"><span>⚙</span>设置</button>    </nav>
   </div>
 
   <dialog class="modal" id="entity-modal" aria-labelledby="modal-title">
