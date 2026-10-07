@@ -1,0 +1,27 @@
+const assert=require('node:assert/strict');
+const path=require('node:path');
+const {pathToFileURL}=require('node:url');
+const core=require('../dist/app.js');
+const {chromium}=require('C:/Users/xing/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{
+ require('node:fs').mkdirSync(path.resolve(__dirname,'../../05预览'),{recursive:true});
+ assert.equal(core.weekStart('2026-10-11'),'2026-10-05');assert.equal(core.weekStart('2027-01-01'),'2026-12-28');assert.equal(core.validDate('2026-02-30'),false);
+ const old={version:1,notes:[{title:'旧笔记'}],transactions:[],tasks:[],overtimeEntries:[{id:'ot1',date:'2026-10-06',hours:2.5,note:'项目收尾'}],settings:{theme:'light'}};
+ const migrated=core.migrate(old);assert.equal(migrated.overtimeEntries[0].hours,2.5);assert.equal(migrated.legacy.notes[0].title,'旧笔记');assert.throws(()=>core.migrate({...old,overtimeEntries:[...old.overtimeEntries,...old.overtimeEntries]}));
+ const browser=await chromium.launch({channel:'msedge',headless:true});
+ const page=await browser.newPage({viewport:{width:1280,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(pathToFileURL(path.resolve(__dirname,'../dist/index.html')).href);
+ await page.evaluate(old=>{localStorage.setItem('sticky-life-data-v1',JSON.stringify(old));},old);await page.reload();
+ assert.equal(await page.locator('[data-view="notes"]').count(),0);
+ await page.locator('.main-nav [data-view="logs"]').click();await page.locator('#view-logs [data-create="logs"]').click();
+ await page.locator('[name="date"]').fill('2026-10-06');await page.locator('[name="content"]').fill('完成接口优化 <script>危险</script>');await page.locator('[name="issues"]').fill('等待评审');await page.locator('[name="plan"]').fill('部署验证');await page.locator('#entity-form [type="submit"]').click();
+ await page.reload();assert.match(await page.locator('#logs-list').innerText(),/完成接口优化/);assert.equal(await page.locator('#logs-list script').count(),0);
+ await page.locator('.main-nav [data-view="reports"]').click();await page.locator('#view-reports [data-create="reports"]').click();await page.locator('[name="date"]').fill('2026-10-06');await page.locator('#regenerate').click();assert.match(await page.locator('[name="content"]').inputValue(),/完成接口优化/);assert.match(await page.locator('#report-hours').innerText(),/2.5/);await page.locator('#entity-form [type="submit"]').click();
+ const downloadPromise=page.waitForEvent('download');await page.locator('#reports-list [data-download]').click();const download=await downloadPromise;assert.equal(download.suggestedFilename(),'周报-2026-10-05.txt');
+ await page.locator('.main-nav [data-view="overtime"]').click();await page.locator('[data-date="2026-10-06"]').click();await page.locator('[name="hours"]').fill('3.5');await page.locator('#entity-form [type="submit"]').click();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('sticky-life-data-v1')).overtimeEntries[0].hours),3.5);
+ await page.locator('#theme-toggle').click();assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');await page.locator('#theme-toggle').click();
+ await page.locator('.main-nav [data-view="dashboard"]').click();await page.waitForTimeout(400);await page.screenshot({path:path.resolve(__dirname,'../../05预览/preview-home.png'),fullPage:true});
+ await page.locator('.main-nav [data-view="reports"]').click();await page.waitForTimeout(400);await page.screenshot({path:path.resolve(__dirname,'../../05预览/preview-reports.png'),fullPage:true});
+ await page.locator('#reports-list [data-delete]').click();await page.locator('#confirm-accept').click();assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('sticky-life-data-v1')).reports.length),0);
+ assert.deepEqual(errors,[]);await browser.close();console.log('PASS: migration, validation, date boundaries, navigation, log persistence, escaping, weekly draft, export, overtime editing, theme, deletion; no browser errors.');
+})().catch(e=>{console.error(e);process.exit(1);});

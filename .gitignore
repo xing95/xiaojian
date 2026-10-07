@@ -1,0 +1,16 @@
+# Installed application, installers and local backups
+/01软件/
+/02安装包/
+/04备份/
+
+# Dependencies and build output
+node_modules/
+/03源码/build-tools/dist/
+*.log
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db

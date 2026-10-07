@@ -1,0 +1,28 @@
+{
+  "appId": "com.xiaojian.stickylife",
+  "productName": "小笺",
+  "electronVersion": "44.3.0",
+  "executableName": "小笺",
+  "artifactName": "小笺-安装版-${version}-${arch}.${ext}",
+  "compression": "maximum",
+  "directories": { "output": "../02安装包/1.2.0" },
+  "win": {
+    "target": [{ "target": "nsis", "arch": ["x64"] }],
+    "icon": "../01软件/小笺/uninstallerIcon.ico",
+    "signAndEditExecutable": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "小笺",
+    "deleteAppDataOnUninstall": false,
+    "installerLanguages": ["zh_CN"],
+    "language": "2052",
+    "installerIcon": "../01软件/小笺/uninstallerIcon.ico",
+    "uninstallerIcon": "../01软件/小笺/uninstallerIcon.ico"
+  }
+}

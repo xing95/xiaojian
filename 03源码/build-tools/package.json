@@ -1,0 +1,8 @@
+{
+  "name": "xiaojian-build-tools",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "electron-builder": "26.0.12"
+  }
+}

@@ -1,0 +1,42 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {pathToFileURL}=require('node:url');
+const core=require('../dist/app.js');
+const {chromium}=require('C:/Users/xing/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{
+ require('node:fs').mkdirSync(path.resolve(__dirname,'../../05预览'),{recursive:true});
+ const fixture={version:2,overtimeEntries:[{id:'a',date:'2025-12-30',hours:10,note:'年末上线'},{id:'b',date:'2026-02-06',hours:6,note:'交付'},{id:'c',date:'2026-10-06',hours:4,note:'优化'}],logs:[],reports:[],settings:{theme:'light'}};
+ const data=core.migrate(fixture);assert.equal(data.version,3);assert.deepEqual(data.leaveEntries,[]);
+ data.leaveEntries=[{id:'l1',date:'2026-01-10',hours:3,note:'补休'},{id:'l2',date:'2026-10-07',hours:5,note:'调休'}];
+ assert.deepEqual(core.timeTotals(data),{overtime:20,leave:8,balance:12});
+ const rows=core.monthlyHistory(data,'2026-10');assert.equal(rows.length,11);
+ assert.deepEqual(rows.find(r=>r.month==='2026-01'),{month:'2026-01',overtime:0,leave:3,days:0,leaveDays:1,net:-3,opening:10,balance:7});
+ assert.equal(rows.find(r=>r.month==='2026-03').balance,13);assert.equal(rows[0].balance,12);
+ assert.equal(core.timeTotals({...data,leaveEntries:[{hours:25}]}).balance,-5);
+ assert.throws(()=>core.migrate({...data,leaveEntries:[{id:'bad',date:'2026-02-30',hours:2,note:''}]}));
+ const browser=await chromium.launch({channel:'msedge',headless:true});
+ try{
+ const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.clock.setFixedTime(new Date('2026-10-06T12:00:00+08:00'));
+ await page.goto(pathToFileURL(path.resolve(__dirname,'../dist/index.html')).href);
+ await page.evaluate(data=>localStorage.setItem('sticky-life-data-v1',JSON.stringify(data)),data);await page.reload();
+ assert.match(await page.locator('#dashboard-balance').innerText(),/12.0 小时/);
+ await page.locator('.main-nav [data-view="overtime"]').click();
+ assert.equal(await page.locator('#history-body tr').count(),11);
+ await page.locator('#history-year').selectOption('2025');assert.equal(await page.locator('#history-body tr').count(),1);
+ await page.locator('#history-year').selectOption('2026');assert.equal(await page.locator('#history-body tr').count(),10);
+ const dp=page.waitForEvent('download');await page.locator('#history-export').click();const download=await dp;const csv=fs.readFileSync(await download.path(),'utf8');assert.match(csv,/2026-01,0.0,0,3.0,-3.0,10.0,7.0/);assert.ok(!csv.includes('2025-12'));
+ await page.locator('[data-month="2026-01"]').click();assert.equal(await page.locator('#calendar-month').inputValue(),'2026-01');
+ await page.locator('.main-nav [data-view="leave"]').click();await page.locator('#view-leave [data-create]').click();await page.locator('[name="date"]').fill('2026-10-08');await page.locator('[name="hours"]').fill('2');await page.locator('[name="note"]').fill('下午调休');await page.locator('#entity-form [type="submit"]').click();
+ assert.match(await page.locator('#leave-summary').innerText(),/10.0 小时/);await page.reload();assert.match(await page.locator('#leave-list').innerText(),/下午调休/);
+ await page.locator('#leave-list [data-edit]').first().click();await page.locator('[name="hours"]').fill('2.3');await page.locator('#entity-form [type="submit"]').click();assert.match(await page.locator('#form-error').innerText(),/0.5/);await page.locator('[name="hours"]').fill('3');await page.locator('#entity-form [type="submit"]').click();assert.match(await page.locator('#leave-summary').innerText(),/9.0 小时/);
+ await page.locator('#leave-month').fill('2026-01');assert.equal(await page.locator('#leave-list article').count(),1);await page.locator('#leave-all').click();
+ await page.locator('#leave-list [data-delete]').first().click();await page.locator('#confirm-accept').click();assert.match(await page.locator('#leave-summary').innerText(),/12.0 小时/);
+ await page.locator('.main-nav [data-view="overtime"]').click();await page.locator('#calendar-month').fill('2026-10');assert.match(await page.locator('[data-date="2026-10-07"]').innerText(),/休 5h/);
+ await page.waitForTimeout(400);await page.screenshot({path:path.resolve(__dirname,'../../05预览/preview-history.png'),fullPage:true});
+ await page.locator('.main-nav [data-view="leave"]').click();await page.waitForTimeout(400);await page.screenshot({path:path.resolve(__dirname,'../../05预览/preview-leave.png'),fullPage:true});
+ await page.setViewportSize({width:880,height:620});await page.locator('.main-nav [data-view="overtime"]').click();await page.waitForTimeout(400);await page.screenshot({path:path.resolve(__dirname,'../../05预览/preview-compact.png'),fullPage:true});
+ assert.deepEqual(errors,[]);console.log('PASS: v2 migration, cross-year/month carryover, zero months, negative balance, CSV, year filtering, month jump, leave create/edit/delete/persistence/validation, calendar marks, compact layout.');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1);});
